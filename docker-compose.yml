@@ -1,0 +1,48 @@
+version: '3.0'
+services:
+  web:
+    build: docker_web/nginx
+    container_name: postino_web_container
+    environment:
+      - APACHE_RUN_USER=www-data
+    volumes:
+      - $PWD:${APP_PATH_CONTAINER}
+      - /app/vendor
+    ports:
+      - 8066:80
+    working_dir: ${APP_PATH_CONTAINER}
+    links:
+      - php
+    restart: unless-stopped
+  php:
+    build: docker_web/php
+    container_name: postino_php_container
+    working_dir: ${APP_PATH_CONTAINER}
+    volumes:
+      - $PWD:${APP_PATH_CONTAINER}
+#    ports:
+#      - "9004:9000"
+    restart: unless-stopped
+  db:
+    build: docker_web/db
+    container_name: postino_db_container
+    restart: unless-stopped
+    volumes:
+      - "./postgres-data:/var/lib/postgresql/data:delegated"
+      - $PWD:${APP_PATH_CONTAINER}:delegated
+    environment:
+      POSTGRES_PASSWORD: postino_dev
+      POSTGRES_USER: postino_dev
+      POSTGRES_DB: postino_dev
+    ports:
+      - "8067:5432"
+  db-test:
+    build: docker_web/db
+    container_name: postino_db_container_test
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postino_test
+      POSTGRES_USER: postino_test
+      POSTGRES_DB: postino_test
+    ports:
+      - "8068:5432"

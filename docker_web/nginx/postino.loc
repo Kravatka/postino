@@ -1,0 +1,50 @@
+server {
+	listen 80;
+	listen [::]:80;
+
+	server_name localhost;
+
+	root /var/www/html/public;
+
+	gzip_static on;
+	gzip_http_version   1.1;
+	gzip_proxied        expired no-cache no-store private auth;
+	gzip_disable        "MSIE [1-6]\.";
+	gzip_vary           on;
+
+	client_body_buffer_size 8K;
+	client_max_body_size 20m;
+	client_body_timeout 10s;
+	client_header_buffer_size 1k;
+	large_client_header_buffers 2 16k;
+	client_header_timeout 5s;
+
+        index index.php index.html index.htm index.nginx-debian.html;
+
+     add_header 'Access-Control-Allow-Origin' "*" always;
+     add_header 'Access-Control-Allow-Methods' 'GET, PUT, PATCH, POST, OPTIONS' always;
+     add_header 'Access-Control-Allow-Credentials' 'true' always;
+     add_header 'Access-Control-Allow-Headers' '*' always;
+
+	location / {
+		try_files $uri $uri/ /index.php?$query_string;
+	}
+
+	location ~ \.php$ {
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+		# This line passes requests through to the PHP-FPM container
+		fastcgi_pass php:9000;
+		fastcgi_index index.php;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param PATH_INFO $fastcgi_path_info;
+        }
+
+        location ~ /\.ht {
+                allow all;
+        }
+
+        location ~ /.well-known {
+                allow all;
+        }
+}
