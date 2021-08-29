@@ -39,7 +39,8 @@ RUN docker-php-ext-install mbstring \
 	pdo_pgsql \
 	pdo_mysql \
 	calendar \
-	opcache
+	opcache \
+	sockets
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
